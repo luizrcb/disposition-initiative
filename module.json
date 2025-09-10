@@ -1,6 +1,6 @@
 {
   "id": "disposition-initiative",
-  "title": "Dispostion Initiative",
+  "title": "Disposition Initiative",
   "description": "Group initiative by token disposition. Roll initiative once per side (friendly, neutral, hostile and secret)",
   "version": "#{VERSION}#",
   "library": "false",
