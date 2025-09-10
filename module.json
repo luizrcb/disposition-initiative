@@ -1,17 +1,17 @@
 {
   "id": "disposition-initiative",
   "title": "Dispostion Initiative",
-  "description": "",
+  "description": "Group initiative by token disposition. Roll initiative once per side (friendly, neutral, hostile and secret)",
   "version": "#{VERSION}#",
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
-    "minimum": 13,
-    "verified": 13
+    "minimum": "13",
+    "verified": "13"
   },
   "authors": [
     {
-      "name": "Luiz Bertoni",
+      "name": "Luber",
       "discord": "nightlybuild_",
       "email": "luizrcb@gmail.com",
       "url": "https://github.com/luizrcb"
