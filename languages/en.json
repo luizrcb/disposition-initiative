@@ -1,3 +1,4 @@
 {
-    "MODULE.hello": "hello"
+  "DispInit.Error.NoSelectedToken": "Select all tokens that will be part of the encounter. No need to create the encounter beforehand.",
+  "DispInit.Button.Title": "Disposition Initiative"
 }
