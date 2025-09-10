@@ -26,7 +26,7 @@ This keeps combat moving quickly, especially in larger encounters, while still k
 ## How To
 
 1) Select all tokens you want to roll initiative. You don't need to create the encounter beforehand.
-2) Click tha Group Initiative button in the Token Controls menu (or press down the key shortcut `g`).
+2) Click tha Disposition Initiative button in the Token Controls menu (or press down the key shortcut `g`).
 
 ## Changelog
 
