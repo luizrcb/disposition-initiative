@@ -1,13 +1,28 @@
+const moduleName = "disposition-initiative";
+
+function getUniqueRandomDecimals(count = 5) {
+  const nums = new Set();
+
+  while (nums.size < count) {
+    const digit = Math.floor(Math.random() * 9) + 1;
+    nums.add(digit / 10);
+  }
+
+  return Array.from(nums);
+}
+
 export default class DispInit {
   async groupInitiative() {
+    const tieBreakers = getUniqueRandomDecimals();
+
     const tokens = canvas.tokens.controlled;
 
-    const excluded = [];
     const groups = {
-      group1: [], // Players and Friendly Tokens
-      group2: [], // Neutral Tokens
-      group3: [], // Hostile Tokens
-      group4: [], // secret Tokens
+      players: [],
+      friendly: [],
+      neutral: [],
+      hostile: [],
+      secret: [],
     };
 
     if (!tokens || !tokens.length) {
@@ -17,11 +32,23 @@ export default class DispInit {
       });
     }
 
+    const initiativeTieBreak = game.settings.get(
+      moduleName,
+      "initiativeTieBreak"
+    );
+    const groupPlayersToFriendlyTokens = game.settings.get(
+      moduleName,
+      "groupPlayersToFriendlyTokens"
+    );
+
     // Separate tokens into groups
     for (const token of tokens) {
-      const actor = token.actor;
       if (token.document.hasPlayerOwner === true) {
-        groups.group1.push(token);
+        if (groupPlayersToFriendlyTokens) {
+          groups.friendly.push(token);
+        } else {
+          groups.players.push(token);
+        }
       } else {
         const isFriendlyToken =
           token.document.disposition === CONST.TOKEN_DISPOSITIONS.FRIENDLY;
@@ -33,19 +60,19 @@ export default class DispInit {
           token.document.disposition === CONST.TOKEN_DISPOSITIONS.SECRET;
 
         if (isFriendlyToken) {
-          groups.group1.push(token);
+          groups.friendly.push(token);
         } else if (isSecretToken) {
-          groups.group4.push(token);
+          groups.secret.push(token);
         } else if (isHostileToken) {
-          groups.group3.push(token);
+          groups.hostile.push(token);
         } else if (isNeutralToken) {
-          groups.group2.push(token);
+          groups.neutral.push(token);
         }
       }
     }
 
     // Process a token group
-    async function processGroup(group) {
+    async function processGroup(group, index) {
       if (group.length === 0) return;
 
       // Select random roller
@@ -61,7 +88,12 @@ export default class DispInit {
         messageOptions: { rollMode: CONST.DICE_ROLL_MODES.PUBLIC },
       });
 
-      const initVal = roller.combatant.initiative;
+      let initVal = roller.combatant.initiative;
+
+      if (initiativeTieBreak) {
+        initVal += tieBreakers[index];
+        await roller.combatant.update({ initiative: initVal });
+      }
 
       // Apply initiative to group
       for (const token of group) {
@@ -75,9 +107,9 @@ export default class DispInit {
       }
     }
 
-    for (let group of Object.values(groups)) {
+    for (const [index, group] of Object.values(groups).entries()) {
       if (group.length) {
-        await processGroup(group);
+        await processGroup(group, index);
       }
     }
   }

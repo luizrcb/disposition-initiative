@@ -21,6 +21,27 @@ Hooks.once("init", async function () {
     reservedModifiers: [],
     precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
   });
+
+  game.settings.register(moduleName, 'initiativeTieBreak', {
+    name: 'DispInit.Settings.InitiativeTiebreak',
+    hint: 'DispInit.Settings.InitiativeTiebreakHint',
+    scope: 'world',
+    config: true,
+    restricted: true,
+    type: Boolean,
+    default: true,
+  });
+
+  game.settings.register(moduleName, 'groupPlayersToFriendlyTokens', {
+    name: 'DispInit.Settings.GroupPlayersToFriendlyTokens',
+    hint: 'DispInit.Settings.GroupPlayersToFriendlyTokensHint',
+    scope: 'world',
+    config: true,
+    restricted: true,
+    type: Boolean,
+    default: true,
+  });
+
 });
 
 Hooks.on("getSceneControlButtons", function (controls) {
