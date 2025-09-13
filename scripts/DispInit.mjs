@@ -1,21 +1,59 @@
 const moduleName = "disposition-initiative";
 
+/**
+ * Return an array of unique decimals in {0.1 ... 0.9}.
+ * Keeps the original behavior and defaults.
+ * @param {number} count
+ * @returns {number[]}
+ */
 function getUniqueRandomDecimals(count = 5) {
   const nums = new Set();
-
   while (nums.size < count) {
-    const digit = Math.floor(Math.random() * 9) + 1;
-    nums.add(digit / 10);
+    const digit = Math.floor(Math.random() * 9) + 1; // 1..9
+    nums.add(digit / 10); // 0.1..0.9
   }
-
   return Array.from(nums);
+}
+
+/** Random pick from a non-empty array */
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/** Ensure a token has a combatant (preserves original API usage) */
+async function ensureCombatant(token) {
+  if (!token.combatant) {
+    await token.toggleCombatant();
+  }
 }
 
 export default class DispInit {
   async groupInitiative() {
     const tieBreakers = getUniqueRandomDecimals();
+    let tokens = [];
+    const combats = game.combats.filter((combat) => combat.active);
 
-    const tokens = canvas.tokens.controlled;
+    if (combats && combats.length) {
+      const combat = combats[0];
+      const combatTokens = combat.combatants.map(
+        (combatant) => combatant.token
+      );
+
+      tokens = [...combatTokens];
+    }
+
+    const canvasTokens = canvas.tokens.controlled.map(token => token.document);
+
+    if (!tokens.length) {
+      tokens = [...canvasTokens];
+    }
+
+    if (!tokens || !tokens.length) {
+      return ui.notifications.warn("DispInit.Error.NoSelectedToken", {
+        localize: true,
+        permanent: true,
+      });
+    }
 
     const groups = {
       players: [],
@@ -25,68 +63,57 @@ export default class DispInit {
       secret: [],
     };
 
-    if (!tokens || !tokens.length) {
-      ui.notifications.warn("DispInit.Error.NoSelectedToken", {
-        localize: true,
-        permanent: true,
-      });
-    }
-
     const initiativeTieBreak = game.settings.get(
       moduleName,
       "initiativeTieBreak"
     );
+
     const groupPlayersToFriendlyTokens = game.settings.get(
       moduleName,
       "groupPlayersToFriendlyTokens"
     );
 
-    // Separate tokens into groups
+    const { FRIENDLY, NEUTRAL, HOSTILE, SECRET } = CONST.TOKEN_DISPOSITIONS;
+    // const ROLL_PUBLIC = CONST.DICE_ROLL_MODES.PUBLIC;
+
+    // Separate tokens into groups (preserving the original logic)
     for (const token of tokens) {
-      if (token.document.hasPlayerOwner === true) {
+      if (token?.hasPlayerOwner === true) {
         if (groupPlayersToFriendlyTokens) {
           groups.friendly.push(token);
         } else {
           groups.players.push(token);
         }
       } else {
-        const isFriendlyToken =
-          token.document.disposition === CONST.TOKEN_DISPOSITIONS.FRIENDLY;
-        const isNeutralToken =
-          token.document.disposition === CONST.TOKEN_DISPOSITIONS.NEUTRAL;
-        const isHostileToken =
-          token.document.disposition === CONST.TOKEN_DISPOSITIONS.HOSTILE;
-        const isSecretToken =
-          token.document.disposition === CONST.TOKEN_DISPOSITIONS.SECRET;
+        const disp = token?.disposition;
 
-        if (isFriendlyToken) {
-          groups.friendly.push(token);
-        } else if (isSecretToken) {
-          groups.secret.push(token);
-        } else if (isHostileToken) {
-          groups.hostile.push(token);
-        } else if (isNeutralToken) {
-          groups.neutral.push(token);
+        switch (disp) {
+          case FRIENDLY:
+            groups.friendly.push(token);
+            break;
+          case SECRET:
+            groups.secret.push(token);
+            break;
+          case HOSTILE:
+            groups.hostile.push(token);
+            break;
+          case NEUTRAL:
+            groups.neutral.push(token);
+            break;
+          // no default: unhandled dispositions are ignored (same behavior)
         }
       }
     }
 
-    // Process a token group
-    async function processGroup(group, index) {
+    // Process a token group (same flow; only factored helpers)
+    const processGroup = async (group, index) => {
       if (group.length === 0) return;
 
-      // Select random roller
-      const roller = group[Math.floor(Math.random() * group.length)];
+      const roller = pickRandom(group);
 
-      // Ensure roller is in combat
-      if (!roller.combatant) {
-        await roller.document.toggleCombatant();
-      }
+      await ensureCombatant(roller);
 
-      // Roll initiative for roller
-      await game.combat.rollAll({
-        messageOptions: { rollMode: CONST.DICE_ROLL_MODES.PUBLIC },
-      });
+      await game.combat.rollInitiative([roller.combatant.id]);
 
       let initVal = roller.combatant.initiative;
 
@@ -95,22 +122,24 @@ export default class DispInit {
         await roller.combatant.update({ initiative: initVal });
       }
 
-      // Apply initiative to group
       for (const token of group) {
         if (token === roller) continue;
 
-        if (!token.combatant) {
-          await token.document.toggleCombatant();
-        }
-
+        await ensureCombatant(token);
         await token.combatant.update({ initiative: initVal });
       }
-    }
+    };
 
     for (const [index, group] of Object.values(groups).entries()) {
       if (group.length) {
         await processGroup(group, index);
       }
+    }
+    const activeCombatHasStarted = game.combats.find(
+      (combat) => combat.active && combat.started
+    );
+    if (activeCombatHasStarted) {
+      await activeCombatHasStarted.update({ round: activeCombatHasStarted.round, turn: 0 });
     }
   }
 }

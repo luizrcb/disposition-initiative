@@ -14,7 +14,12 @@ Hooks.once("init", async function () {
     hint: "This will trigger the Disposition Initiative.",
     editable: [{ key: "KeyG", modifiers: [] }],
     onDown: () => {
-      window.game.dispInit.groupInitiative();
+      const activeCombatHasStarted = game.combats.find(
+        (combat) => combat.active && combat.started
+      );
+      if (!activeCombatHasStarted) {
+        window.game.dispInit.groupInitiative();
+      }
     },
     onUp: () => {},
     restricted: true, // Restrict this Keybinding to gamemaster only?
@@ -22,26 +27,35 @@ Hooks.once("init", async function () {
     precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
   });
 
-  game.settings.register(moduleName, 'initiativeTieBreak', {
-    name: 'DispInit.Settings.InitiativeTiebreak',
-    hint: 'DispInit.Settings.InitiativeTiebreakHint',
-    scope: 'world',
+  game.settings.register(moduleName, "initiativeTieBreak", {
+    name: "DispInit.Settings.InitiativeTiebreak",
+    hint: "DispInit.Settings.InitiativeTiebreakHint",
+    scope: "world",
     config: true,
     restricted: true,
     type: Boolean,
     default: true,
   });
 
-  game.settings.register(moduleName, 'groupPlayersToFriendlyTokens', {
-    name: 'DispInit.Settings.GroupPlayersToFriendlyTokens',
-    hint: 'DispInit.Settings.GroupPlayersToFriendlyTokensHint',
-    scope: 'world',
+  game.settings.register(moduleName, "groupPlayersToFriendlyTokens", {
+    name: "DispInit.Settings.GroupPlayersToFriendlyTokens",
+    hint: "DispInit.Settings.GroupPlayersToFriendlyTokensHint",
+    scope: "world",
     config: true,
     restricted: true,
     type: Boolean,
     default: true,
   });
 
+  game.settings.register(moduleName, "rerollInitiativeEveryRound", {
+    name: "DispInit.Settings.RerollInitiativeEveryRound",
+    hint: "DispInit.Settings.RerollInitiativeEveryRoundHint",
+    scope: "world",
+    config: true,
+    restricted: true,
+    type: Boolean,
+    default: false,
+  });
 });
 
 Hooks.on("getSceneControlButtons", function (controls) {
@@ -55,6 +69,13 @@ Hooks.on("getSceneControlButtons", function (controls) {
         if (active) window.game.dispInit.groupInitiative();
       },
     };
+  }
+});
+
+Hooks.on("updateCombat", async (combat, update) => {
+  if (update && update.round) {
+    const reroll = game.settings.get(moduleName, "rerollInitiativeEveryRound");
+    if (reroll) window.game.dispInit.groupInitiative();
   }
 });
 
