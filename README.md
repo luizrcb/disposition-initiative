@@ -29,7 +29,7 @@ This keeps combat moving quickly, especially in larger encounters, while still k
 
 1. Select all tokens you want to roll initiative for. You don’t need to create the encounter beforehand.  
    - If the encounter is already created and tokens have been added to the combat tracker, you don’t need to select them on the scene canvas.  
-2. Click the **Disposition Initiative** button in the Token Controls menu (or press the `G` shortcut key — note that this shortcut won’t work once the active encounter has already started).  
+2. Click the **Disposition Initiative** button in the Token Controls menu (or press the `g` shortcut key — note that this shortcut won’t work once the active encounter has already started).  
 
 ## Changelog
 
