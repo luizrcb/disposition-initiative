@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.3.2
+
+- Add pt-BR localization
+- Add github action to publish module update to Foundry Admin interface via API
+
 ## 0.3.1
 
 - Fix initiative reroll incorrectly triggering at combat start
