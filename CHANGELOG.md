@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.1
+
+- Fix initiative reroll incorrectly triggering at combat start
+
 ## 0.3.0
 
 - Add a setting to reroll group initiatives at the start of each combat round

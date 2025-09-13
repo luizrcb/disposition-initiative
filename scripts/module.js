@@ -73,7 +73,7 @@ Hooks.on("getSceneControlButtons", function (controls) {
 });
 
 Hooks.on("updateCombat", async (combat, update) => {
-  if (update && update.round) {
+  if (update && update.round && update.round > 1) {
     const reroll = game.settings.get(moduleName, "rerollInitiativeEveryRound");
     if (reroll) window.game.dispInit.groupInitiative();
   }
