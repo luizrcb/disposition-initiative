@@ -18,15 +18,18 @@ This keeps combat moving quickly, especially in larger encounters, while still k
 
 ## Features
 
-- Automatically groups tokens by their disposition (friendly, neutral, secret and hostile).
-- Randomly selects a token from each group to roll initiative.
-- Applies the result to all tokens in that group.
-- Lightweight and easy to use — no extra setup required.
+- Automatically groups tokens by their disposition (friendly, neutral, secret, and hostile).  
+- Randomly selects a token from each group to roll initiative.  
+- Applies the result to all tokens in that group.  
+- Module setting to reroll group initiatives at the start of each new round.  
+- Module setting to choose whether players are grouped with friendly tokens.  
+- Lightweight and easy to use — no extra setup required.  
 
 ## How To
 
-1) Select all tokens you want to roll initiative. You don't need to create the encounter beforehand.
-2) Click the Disposition Initiative button in the Token Controls menu (or press down the key shortcut `g`).
+1. Select all tokens you want to roll initiative for. You don’t need to create the encounter beforehand.  
+   - If the encounter is already created and tokens have been added to the combat tracker, you don’t need to select them on the scene canvas.  
+2. Click the **Disposition Initiative** button in the Token Controls menu (or press the `G` shortcut key — note that this shortcut won’t work once the active encounter has already started).  
 
 ## Changelog
 
