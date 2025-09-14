@@ -29,6 +29,8 @@ async function ensureCombatant(token) {
 
 export default class DispInit {
   async groupInitiative() {
+    if (!game.user.isGM) return;
+
     const tieBreakers = getUniqueRandomDecimals();
     let tokens = [];
     const combats = game.combats.filter((combat) => combat.active);

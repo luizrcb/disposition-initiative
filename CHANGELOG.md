@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.3.4
+
+- Fix initiative rerolls on every turn triggering on player clients
+
+## 0.3.3
+
+- Fix pt-BR localization
+
 ## 0.3.2
 
 - Add pt-BR localization
