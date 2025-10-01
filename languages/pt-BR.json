@@ -1,10 +1,10 @@
 {
-  "DispInit.Error.NoSelectedToken": "Selecione todos os tokens que farão parte do combate. Não é necessário criar o encontro previamente.",
   "DispInit.Button.Title": "Iniciativa por Disposição",
-  "DispInit.Settings.InitiativeTiebreak": "Usar Desempate na Iniciativa de Grupo",
-  "DispInit.Settings.InitiativeTiebreakHint": "Adiciona um valor decimal às rolagens de iniciativa de grupo.\nIniciativas de grupo nunca resultarão exatamente no mesmo valor.",
+  "DispInit.Error.NoSelectedToken": "Selecione todos os tokens que farão parte do combate. Não é necessário criar o encontro previamente.",
   "DispInit.Settings.GroupPlayersToFriendlyTokens": "Agrupar Jogadores com Tokens Amigáveis",
   "DispInit.Settings.GroupPlayersToFriendlyTokensHint": "Quando ativado, jogadores são agrupados junto com tokens amigáveis.",
+  "DispInit.Settings.InitiativeTiebreak": "Usar Desempate na Iniciativa de Grupo",
+  "DispInit.Settings.InitiativeTiebreakHint": "Adiciona um valor decimal às rolagens de iniciativa de grupo.\nIniciativas de grupo nunca resultarão exatamente no mesmo valor.",
   "DispInit.Settings.RerollInitiativeEveryRound": "Rerrolar Iniciativas a Cada Rodada",
   "DispInit.Settings.RerollInitiativeEveryRoundHint": "Quando ativado, a iniciativa de grupo será rerrolada a cada nova rodada."
 }

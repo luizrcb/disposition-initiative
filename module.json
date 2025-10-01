@@ -41,7 +41,8 @@
       "path": "languages/pt-BR.json"
     }
   ],
-  "url": "#{URL}#",
+  "url": "https://github.com/luizrcb/disposition-initiative",
+  "bugs": "https://github.com/luizrcb/disposition-initiative/issues",
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
   "license": "LICENSE",
