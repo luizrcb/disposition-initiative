@@ -15,7 +15,7 @@ Hooks.once("init", async function () {
     editable: [{ key: "KeyG", modifiers: [] }],
     onDown: () => {
       const activeCombatHasStarted = game.combats.find(
-        (combat) => combat.active && combat.started
+        (combat) => combat.active && combat.started,
       );
       if (!activeCombatHasStarted) {
         window.game.dispInit.groupInitiative();
@@ -63,13 +63,33 @@ Hooks.on("getSceneControlButtons", function (controls) {
     controls.tokens.tools["disposition-initiative_button"] = {
       icon: "fa-solid fa-people-group",
       name: "disposition-initiative_button",
-      title: "DispInit.Button.Title",
+      title: "DispInit.GroupInitiative",
       button: true,
       onChange: (event, active) => {
         if (active) window.game.dispInit.groupInitiative();
       },
     };
   }
+});
+
+Hooks.on("renderCombatTracker", (app, html) => {
+  if (!game.user.isGM) return;
+
+  const selector = html.querySelector(
+    "#combat > header > div > div.control-buttons.left.flexrow > button.inline-control.combat-control.icon.fa-solid.fa-users",
+  );
+
+  selector.insertAdjacentHTML(
+    "beforebegin",
+    `<button
+        data-tooltip="DispInit.GroupInitiative" 
+        class="group-initiative inline-control combat-control icon fa-solid fa-people-group">
+      </button>`,
+  );
+
+  html.querySelector(".group-initiative").addEventListener("click", (ev) => {
+    window.game.dispInit.groupInitiative();
+  });
 });
 
 Hooks.on("updateCombat", async (combat, update) => {

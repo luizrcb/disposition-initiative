@@ -1,6 +1,7 @@
 {
   "DispInit.Button.Title": "Iniciativa por Disposição",
   "DispInit.Error.NoSelectedToken": "Selecione todos os tokens que farão parte do combate. Não é necessário criar o encontro previamente.",
+  "DispInit.GroupInitiative": "Iniciativa em Grupo",
   "DispInit.Settings.GroupPlayersToFriendlyTokens": "Agrupar Jogadores com Tokens Amigáveis",
   "DispInit.Settings.GroupPlayersToFriendlyTokensHint": "Quando ativado, jogadores são agrupados junto com tokens amigáveis.",
   "DispInit.Settings.InitiativeTiebreak": "Usar Desempate na Iniciativa de Grupo",

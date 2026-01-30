@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.0
+
+- Added a button in the combat encounters tab to roll group initiatives
+
 ## 0.3.4
 
 - Fix initiative rerolls on every turn triggering on player clients
