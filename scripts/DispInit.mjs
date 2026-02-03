@@ -93,7 +93,7 @@ export default class DispInit {
       secret: [],
     };
 
-    const initiativeTieBreak = game.settings.get(
+    const useInitiativeTiebreaking = game.settings.get(
       moduleName,
       "initiativeTieBreak",
     );
@@ -135,7 +135,11 @@ export default class DispInit {
     }
 
     // Process a token group with intra-group tie-breaking
-    const processGroup = async (group, groupIndex) => {
+    const processGroup = async (
+      group,
+      groupIndex,
+      useInitiativeTiebreaking = false,
+    ) => {
       if (group.length === 0) return;
 
       const roller = pickRandom(group);
@@ -145,7 +149,7 @@ export default class DispInit {
 
       const baseInitiative = Math.floor(roller.combatant.initiative);
 
-      const groupTieBreaker = initiativeTieBreak
+      const groupTieBreaker = useInitiativeTiebreaking
         ? groupTieBreakers[groupIndex]
         : 0;
 
@@ -159,20 +163,13 @@ export default class DispInit {
         const token = group[i];
         await ensureCombatant(token);
 
-        let finalInitiative;
-        if (token === roller) {
+        let finalInitiative = baseInitiative;
+        if (useInitiativeTiebreaking) {
           const rollerTieBreaker = shuffledIntraBreakers[i];
           finalInitiative = safeDecimalAdd(
             baseInitiative,
             groupTieBreaker,
             rollerTieBreaker,
-          );
-        } else {
-          const tokenTieBreaker = shuffledIntraBreakers[i];
-          finalInitiative = safeDecimalAdd(
-            baseInitiative,
-            groupTieBreaker,
-            tokenTieBreaker,
           );
         }
 
@@ -182,7 +179,7 @@ export default class DispInit {
 
     for (const [index, group] of Object.values(groups).entries()) {
       if (group.length) {
-        await processGroup(group, index);
+        await processGroup(group, index, useInitiativeTiebreaking);
       }
     }
 
