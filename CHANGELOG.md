@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.2
+
+- Fixed issue on initiative tie breaking config not working when disabled
+
 ## 0.4.1
 
 - Changed group initiative button to behave like Roll All and Roll NPCs buttons (you need to reset initiative to roll group initiative again)
