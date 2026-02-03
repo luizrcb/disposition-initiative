@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.4.1
+
+- Changed group initiative button to behave like Roll All and Roll NPCs buttons (you need to reset initiative to roll group initiative again)
+- Added a random decimal to combatants inside a same group, so initiatives orders inside a group won't always stay the same
+
 ## 0.4.0
 
 - Added a button in the combat encounters tab to roll group initiatives

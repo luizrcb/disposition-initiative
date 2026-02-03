@@ -97,7 +97,7 @@ Hooks.on("updateCombat", async (combat, update) => {
 
   if (update && update.round && update.round > 1) {
     const reroll = game.settings.get(moduleName, "rerollInitiativeEveryRound");
-    if (reroll) window.game.dispInit.groupInitiative();
+    if (reroll) window.game.dispInit.groupInitiative({ reroll: true });
   }
 });
 
