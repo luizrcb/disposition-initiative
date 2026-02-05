@@ -16,20 +16,26 @@ Disposition Initiative is a Foundry VTT module that simplifies initiative rolls 
 
 This keeps combat moving quickly, especially in larger encounters, while still keeping things fair and dynamic.
 
-## Features
-
-- Automatically groups tokens by their disposition (friendly, neutral, secret, and hostile).  
-- Randomly selects a token from each group to roll initiative.  
-- Applies the result to all tokens in that group.  
-- Module setting to reroll group initiatives at the start of each new round.  
-- Module setting to choose whether players are grouped with friendly tokens.  
-- Lightweight and easy to use — no extra setup required.  
-
 ## How To
 
-1. Select all tokens you want to roll initiative for. You don’t need to create the encounter beforehand.  
-   - If the encounter is already created and tokens have been added to the combat tracker, you don’t need to select them on the scene canvas.  
-2. Click the **Disposition Initiative** button in the Token Controls menu (or press the `g` shortcut key — note that this shortcut won’t work once the active encounter has already started).  
+1. Select all tokens you want to roll initiative for. You don’t need to create the encounter beforehand.
+   - If the encounter is already created and tokens have been added to the combat tracker, you don’t need to select them on the scene canvas.
+2. Click the **Group Initiative** button in the Combat Encounters tab, or in the Token Controls menu (or press the `g` shortcut key).
+
+<p align="center">
+  <img width="300" src="docs/token_control_button.webp">
+  <img width="500" src="docs/encounter_tab_button.webp">
+</p>
+
+## Features
+
+- Automatically groups tokens by their disposition (friendly, neutral, secret, and hostile).
+- Randomly selects a token from each group to roll initiative.
+- Applies the result to all tokens in that group.
+- Module setting to reroll group initiatives at the start of each new round.
+- Module setting to choose whether players are grouped with friendly tokens.
+- Module setting to add decimal values to initiatives for tiebreaking porpuses.
+- Lightweight and easy to use — no extra setup required.
 
 ## Changelog
 
