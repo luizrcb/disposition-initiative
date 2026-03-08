@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.5.0
+
+- Removed Group Initiative button from Token Controls menu (use the one in the encounters menu)
+- If new combatants are added to the encounter and you press the Group Initiative button, instead of rerolling group initiatives, they will get their existing groups initiatives.
+
 ## 0.4.2
 
 - Fixed issue on initiative tie breaking config not working when disabled

@@ -22,7 +22,7 @@ Hooks.once("init", async function () {
       }
     },
     onUp: () => {},
-    restricted: true, // Restrict this Keybinding to gamemaster only?
+    restricted: true,
     reservedModifiers: [],
     precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
   });
@@ -58,20 +58,6 @@ Hooks.once("init", async function () {
   });
 });
 
-Hooks.on("getSceneControlButtons", function (controls) {
-  if (game.user.isGM) {
-    controls.tokens.tools["disposition-initiative_button"] = {
-      icon: "fa-solid fa-people-group",
-      name: "disposition-initiative_button",
-      title: "DispInit.GroupInitiative",
-      button: true,
-      onChange: (event, active) => {
-        if (active) window.game.dispInit.groupInitiative();
-      },
-    };
-  }
-});
-
 Hooks.on("renderCombatTracker", (app, html) => {
   if (!game.user.isGM) return;
 
@@ -82,7 +68,7 @@ Hooks.on("renderCombatTracker", (app, html) => {
   selector.insertAdjacentHTML(
     "beforebegin",
     `<button
-        data-tooltip="DispInit.GroupInitiative" 
+        data-tooltip="DispInit.GroupInitiative"
         class="group-initiative inline-control combat-control icon fa-solid fa-people-group">
       </button>`,
   );

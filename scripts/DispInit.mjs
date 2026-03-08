@@ -1,44 +1,15 @@
 const moduleName = "disposition-initiative";
 
-/**
- * Return an array of unique decimals in {0.1 ... 0.9}.
- * Keeps the original behavior and defaults.
- * @param {number} count
- * @returns {number[]}
- */
-function getUniqueRandomDecimals(count = 5) {
-  const nums = new Set();
-  while (nums.size < count) {
-    const digit = Math.floor(Math.random() * 9) + 1; // 1..9
-    nums.add(digit / 10); // 0.1..0.9
-  }
-  return Array.from(nums);
-}
-
-/**
- * Return an array of unique small decimals (0.01 to 0.09) for intra-group tie-breaking
- * @param {number} count - Number of tokens in the group
- * @returns {number[]}
- */
-function getUniqueIntraGroupDecimals(count) {
-  const availableDigits = [...Array(9).keys()].map((i) => i + 1);
-  const shuffled = [...availableDigits].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count).map((digit) => digit / 100);
-}
-
-/** Random pick from a non-empty array */
 function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/** Ensure a token has a combatant (preserves original API usage) */
 async function ensureCombatant(token) {
   if (!token.combatant) {
     await token.toggleCombatant();
   }
 }
 
-/** Safely add decimals without floating point precision issues */
 function safeDecimalAdd(base, decimal1, decimal2 = 0) {
   const total =
     Math.round(base * 100) +
@@ -51,31 +22,16 @@ export default class DispInit {
   async groupInitiative({ reroll = false } = {}) {
     if (!game.user.isGM) return;
 
-    const groupTieBreakers = getUniqueRandomDecimals();
     let tokens = [];
     const combats = game.combats.filter((combat) => combat.active);
 
     if (combats && combats.length) {
       const combat = combats[0];
-      const combatTokens = combat.combatants.map(
-        (combatant) => combatant.token,
-      );
-
-      const alreadyRolled = combat.combatants.contents.every(
-        (c) => c.initiative !== null,
-      );
-
-      if (alreadyRolled && !reroll) return;
-
-      tokens = [...combatTokens];
+      tokens = combat.combatants.map((combatant) => combatant.token);
     }
 
-    const canvasTokens = canvas.tokens.controlled.map(
-      (token) => token.document,
-    );
-
     if (!tokens.length) {
-      tokens = [...canvasTokens];
+      tokens = canvas.tokens.controlled.map((token) => token.document);
     }
 
     if (!tokens || !tokens.length) {
@@ -105,7 +61,6 @@ export default class DispInit {
 
     const { FRIENDLY, NEUTRAL, HOSTILE, SECRET } = CONST.TOKEN_DISPOSITIONS;
 
-    // Separate tokens into groups (preserving the original logic)
     for (const token of tokens) {
       if (token?.hasPlayerOwner === true) {
         if (groupPlayersToFriendlyTokens) {
@@ -129,57 +84,102 @@ export default class DispInit {
           case NEUTRAL:
             groups.neutral.push(token);
             break;
-          // no default: unhandled dispositions are ignored (same behavior)
         }
       }
     }
 
-    // Process a token group with intra-group tie-breaking
-    const processGroup = async (
-      group,
-      groupIndex,
-      useInitiativeTiebreaking = false,
-    ) => {
-      if (group.length === 0) return;
-
-      const roller = pickRandom(group);
-      await ensureCombatant(roller);
-
-      await game.combat.rollInitiative([roller.combatant.id]);
-
-      const baseInitiative = Math.floor(roller.combatant.initiative);
-
-      const groupTieBreaker = useInitiativeTiebreaking
-        ? groupTieBreakers[groupIndex]
-        : 0;
-
-      const intraGroupTieBreakers = getUniqueIntraGroupDecimals(group.length);
-
-      const shuffledIntraBreakers = [...intraGroupTieBreakers].sort(
-        () => Math.random() - 0.5,
-      );
-
-      for (let i = 0; i < group.length; i++) {
-        const token = group[i];
-        await ensureCombatant(token);
-
-        let finalInitiative = baseInitiative;
-        if (useInitiativeTiebreaking) {
-          const rollerTieBreaker = shuffledIntraBreakers[i];
-          finalInitiative = safeDecimalAdd(
-            baseInitiative,
-            groupTieBreaker,
-            rollerTieBreaker,
-          );
+    const usedTenths = new Set();
+    if (!reroll) {
+      for (const group of Object.values(groups)) {
+        for (const token of group) {
+          const init = token.combatant?.initiative;
+          if (init != null) {
+            const tenths = Math.floor((init * 10) % 10);
+            if (tenths > 0) usedTenths.add(tenths);
+          }
         }
-
-        await token.combatant.update({ initiative: finalInitiative });
       }
+    }
+
+    const getUniqueTenths = () => {
+      const available = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(
+        (d) => !usedTenths.has(d),
+      );
+      if (available.length === 0) {
+        console.warn(
+          "All tenths digits are already used; using 0 as tie‑breaker.",
+        );
+        return 0;
+      }
+      const shuffled = available.sort(() => Math.random() - 0.5);
+      const chosen = shuffled[0];
+      usedTenths.add(chosen);
+      return chosen / 10;
     };
 
-    for (const [index, group] of Object.values(groups).entries()) {
-      if (group.length) {
-        await processGroup(group, index, useInitiativeTiebreaking);
+    for (const [groupIndex, group] of Object.values(groups).entries()) {
+      if (group.length === 0) continue;
+
+      const existing = [];
+      const missing = [];
+      for (const token of group) {
+        const hasInit = token.combatant?.initiative != null;
+        if (hasInit && !reroll) {
+          existing.push(token);
+        } else {
+          missing.push(token);
+        }
+      }
+      if (missing.length === 0) continue;
+
+      let base;
+      let groupTieBreaker;
+      const existingHundredths = new Set();
+
+      if (existing.length > 0 && !reroll) {
+        const firstInit = existing[0].combatant.initiative;
+        base = Math.floor(firstInit);
+        groupTieBreaker = Math.floor((firstInit * 10) % 10) / 10;
+
+        for (const token of existing) {
+          const hundredths =
+            Math.floor((token.combatant.initiative * 100) % 10) / 100;
+          existingHundredths.add(hundredths);
+        }
+      } else {
+        const roller = pickRandom(group);
+        await ensureCombatant(roller);
+        await game.combat.rollInitiative([roller.combatant.id]);
+        const rolled = roller.combatant.initiative;
+        base = Math.floor(rolled);
+
+        groupTieBreaker = getUniqueTenths();
+      }
+
+      const allowedDigits = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(
+        (d) => !existingHundredths.has(d / 100),
+      );
+      const shuffledAllowed = allowedDigits.sort(() => Math.random() - 0.5);
+      const hundredthsList = [];
+      for (let i = 0; i < missing.length; i++) {
+        if (shuffledAllowed.length === 0) {
+          hundredthsList.push([1, 2, 3, 4, 5, 6, 7, 8, 9][i % 9] / 100);
+        } else {
+          hundredthsList.push(
+            shuffledAllowed[i % shuffledAllowed.length] / 100,
+          );
+        }
+      }
+
+      for (let i = 0; i < missing.length; i++) {
+        const token = missing[i];
+        const hundredths = hundredthsList[i];
+        let finalInitiative = base;
+        if (useInitiativeTiebreaking) {
+          finalInitiative = safeDecimalAdd(base, groupTieBreaker, hundredths);
+        }
+        await ensureCombatant(token);
+        await token.combatant.update({ initiative: finalInitiative });
       }
     }
 
