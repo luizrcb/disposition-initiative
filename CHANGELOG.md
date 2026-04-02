@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.0
+
+- Added v14 support
+
 ## 0.5.0
 
 - Removed Group Initiative button from Token Controls menu (use the one in the encounters menu)
