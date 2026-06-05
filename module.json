@@ -43,6 +43,9 @@
   ],
   "url": "https://github.com/luizrcb/disposition-initiative",
   "bugs": "https://github.com/luizrcb/disposition-initiative/issues",
+  "flags": {
+    "allowBugReporter": true
+  },
   "manifest": "#{MANIFEST}#",
   "download": "#{DOWNLOAD}#",
   "license": "LICENSE",
